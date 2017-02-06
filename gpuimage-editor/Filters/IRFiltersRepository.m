@@ -113,15 +113,6 @@
                                                                         maxValue:@(1.0)]
                            ]
         ],
-        [IRFilterDescription descriptionWithName:@"Lookup"
-                                       className:@"GPUImageLookupFilter"
-                           parametersDescription:@[
-                               [IRFilterParameterDescription descriptionWithName:@"intensity"
-                                                                      setterName:@"setIntensity:"
-                                                                        minValue:@(0.0)
-                                                                        maxValue:@(1.0)]
-                           ]
-        ],
         [IRFilterDescription descriptionWithName:@"Amatorka"
                                        className:@"GPUImageAmatorkaFilter"
                            parametersDescription:@[]
