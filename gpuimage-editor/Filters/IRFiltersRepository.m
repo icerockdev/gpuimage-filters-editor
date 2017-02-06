@@ -188,7 +188,7 @@
                                [IRFilterParameterDescription descriptionWithName:@"thresholdMultiplier"
                                                                       setterName:@"setThresholdMultiplier:"
                                                                         minValue:@(0.0)
-                                                                        maxValue:@(16.0)]
+                                                                        maxValue:@(1.5)]
                            ]
         ],
         [IRFilterDescription descriptionWithName:@"Sharpen"
