@@ -222,12 +222,12 @@
                            parametersDescription:@[
                                [IRFilterParameterDescription descriptionWithName:@"crossHatchSpacing"
                                                                       setterName:@"setCrossHatchSpacing:"
-                                                                        minValue:@(0.0)
+                                                                        minValue:@(0.1)
                                                                         maxValue:@(0.5)],
                                [IRFilterParameterDescription descriptionWithName:@"lineWidth"
                                                                       setterName:@"setLineWidth:"
                                                                         minValue:@(0.0)
-                                                                        maxValue:@(0.5)]
+                                                                        maxValue:@(0.25)]
                            ]
         ],
         [IRFilterDescription descriptionWithName:@"Sketch"
