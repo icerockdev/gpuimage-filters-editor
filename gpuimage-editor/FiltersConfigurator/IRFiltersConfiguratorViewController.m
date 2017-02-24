@@ -116,7 +116,7 @@
 
     NSString* className = self.tableData[i].filterDescription.className;
     id filter = [NSClassFromString(className) new];
-    [filtersCode appendString:[NSString stringWithFormat:@"filters[%i] = [%@ new];\n", enabledFilterIdx, className]];
+    [filtersCode appendString:[NSString stringWithFormat:@"filters[%lu] = [%@ new];\n", (unsigned long)enabledFilterIdx, className]];
 
     for (NSUInteger j = 0; j < self.tableData[i].filterDescription.parametersDescription.count; j++) {
       IRFilterParameterDescription *parameterDescription = self.tableData[i].filterDescription.parametersDescription[j];
@@ -132,7 +132,7 @@
       [invocation setArgument:&value atIndex:2];
       [invocation invoke];
 
-      [filtersCode appendString:[NSString stringWithFormat:@"[((%@*)filters[%i]) %@%f];\n", className, enabledFilterIdx, setterName, value]];
+      [filtersCode appendString:[NSString stringWithFormat:@"[((%@*)filters[%lu]) %@%f];\n", className, (unsigned long)enabledFilterIdx, setterName, value]];
     }
 
     [filters addObject:filter];
