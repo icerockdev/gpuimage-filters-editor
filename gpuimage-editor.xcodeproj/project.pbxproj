@@ -20,6 +20,9 @@
 		D37E16FF1E488D8000EC5395 /* IRFiltersConfiguratorCellData.m in Sources */ = {isa = PBXBuildFile; fileRef = D37E16FE1E488D8000EC5395 /* IRFiltersConfiguratorCellData.m */; };
 		D37E17051E488DCA00EC5395 /* IRFiltersConfiguratorViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D37E17011E488DCA00EC5395 /* IRFiltersConfiguratorViewController.m */; };
 		D37E17061E488DCA00EC5395 /* IRFiltersConfiguratorTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = D37E17021E488DCA00EC5395 /* IRFiltersConfiguratorTableViewCell.m */; };
+		D38858601E604E990099C459 /* IRLayersTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D388585F1E604E990099C459 /* IRLayersTableViewController.m */; };
+		D38858631E604FDA0099C459 /* IRLayerTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = D38858621E604FDA0099C459 /* IRLayerTableViewCell.m */; };
+		D38858661E6056390099C459 /* IRLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = D38858651E6056390099C459 /* IRLayer.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -48,6 +51,12 @@
 		D37E17021E488DCA00EC5395 /* IRFiltersConfiguratorTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IRFiltersConfiguratorTableViewCell.m; sourceTree = "<group>"; };
 		D37E17031E488DCA00EC5395 /* IRFiltersConfiguratorTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IRFiltersConfiguratorTableViewCell.h; sourceTree = "<group>"; };
 		D37E17041E488DCA00EC5395 /* IRFiltersConfiguratorViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IRFiltersConfiguratorViewController.h; sourceTree = "<group>"; };
+		D388585E1E604E990099C459 /* IRLayersTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IRLayersTableViewController.h; sourceTree = "<group>"; };
+		D388585F1E604E990099C459 /* IRLayersTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IRLayersTableViewController.m; sourceTree = "<group>"; };
+		D38858611E604FDA0099C459 /* IRLayerTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IRLayerTableViewCell.h; sourceTree = "<group>"; };
+		D38858621E604FDA0099C459 /* IRLayerTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IRLayerTableViewCell.m; sourceTree = "<group>"; };
+		D38858641E6056390099C459 /* IRLayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IRLayer.h; sourceTree = "<group>"; };
+		D38858651E6056390099C459 /* IRLayer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IRLayer.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -105,6 +114,7 @@
 				67922FF19B66CB1FE599A6DA /* Assets.xcassets */,
 				D37E16ED1E48797600EC5395 /* Filters */,
 				D37E17001E488DA600EC5395 /* FiltersConfigurator */,
+				D388585D1E604E480099C459 /* Layers */,
 				67922B36465A74FC68E1D2B8 /* Info.plist */,
 				D37E16DB1E48747200EC5395 /* IRPreviewViewController.h */,
 				D37E16DC1E48747200EC5395 /* IRPreviewViewController.m */,
@@ -139,6 +149,19 @@
 				D37E17011E488DCA00EC5395 /* IRFiltersConfiguratorViewController.m */,
 			);
 			path = FiltersConfigurator;
+			sourceTree = "<group>";
+		};
+		D388585D1E604E480099C459 /* Layers */ = {
+			isa = PBXGroup;
+			children = (
+				D388585E1E604E990099C459 /* IRLayersTableViewController.h */,
+				D388585F1E604E990099C459 /* IRLayersTableViewController.m */,
+				D38858611E604FDA0099C459 /* IRLayerTableViewCell.h */,
+				D38858621E604FDA0099C459 /* IRLayerTableViewCell.m */,
+				D38858641E6056390099C459 /* IRLayer.h */,
+				D38858651E6056390099C459 /* IRLayer.m */,
+			);
+			path = Layers;
 			sourceTree = "<group>";
 		};
 		FCD90A202AA243ADC165F6F5 /* Frameworks */ = {
@@ -270,7 +293,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				679229DC6818E35735001F75 /* main.m in Sources */,
+				D38858631E604FDA0099C459 /* IRLayerTableViewCell.m in Sources */,
 				D37E17051E488DCA00EC5395 /* IRFiltersConfiguratorViewController.m in Sources */,
+				D38858601E604E990099C459 /* IRLayersTableViewController.m in Sources */,
+				D38858661E6056390099C459 /* IRLayer.m in Sources */,
 				D37E16F61E4879BF00EC5395 /* IRFilterParameterDescription.m in Sources */,
 				D37E16DD1E48747200EC5395 /* IRPreviewViewController.m in Sources */,
 				67922D2E9E231EF25BF5C771 /* AppDelegate.m in Sources */,
