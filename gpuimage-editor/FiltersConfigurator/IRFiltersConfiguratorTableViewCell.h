@@ -8,8 +8,8 @@
 
 #import <UIKit/UIKit.h>
 
-@class IRFiltersConfiguratorCellData;
 @class IRFiltersConfiguratorTableViewCell;
+@class IRFilterConfiguration;
 
 @protocol IRFiltersConfiguratorTableViewCellDelegate<NSObject>
 
@@ -23,6 +23,6 @@
 
 @property (nonatomic, weak) id<IRFiltersConfiguratorTableViewCellDelegate> delegate;
 
-- (void)fill:(IRFiltersConfiguratorCellData*)cellData;
+- (void)fill:(IRFilterConfiguration*)configuration;
 
 @end

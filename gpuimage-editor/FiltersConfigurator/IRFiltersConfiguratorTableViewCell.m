@@ -9,7 +9,7 @@
 #import "IRFiltersConfiguratorTableViewCell.h"
 #import "IRFilterDescription.h"
 #import "IRFilterParameterDescription.h"
-#import "IRFiltersConfiguratorCellData.h"
+#import "IRFilterConfiguration.h"
 
 @interface IRFiltersConfiguratorTableViewCell()
 
@@ -20,26 +20,15 @@
 
 @implementation IRFiltersConfiguratorTableViewCell
 
-- (void)awakeFromNib {
-    [super awakeFromNib];
-    // Initialization code
-}
-
-- (void)setSelected:(BOOL)selected animated:(BOOL)animated {
-    [super setSelected:selected animated:animated];
-
-    // Configure the view for the selected state
-}
-
-- (void)fill:(IRFiltersConfiguratorCellData*)cellData {
-  self.nameLabel.text = cellData.filterDescription.name;
+- (void)fill:(IRFilterConfiguration*)configuration {
+  self.nameLabel.text = configuration.filterDescription.name;
 
   for(NSInteger i = self.parametersStackView.subviews.count - 1;i >= 0;i--) {
     [self.parametersStackView.subviews[i] removeFromSuperview];
   }
 
-  for(NSInteger i = 0;i < cellData.filterDescription.parametersDescription.count;i++) {
-    IRFilterParameterDescription *parameterDescription = cellData.filterDescription.parametersDescription[i];
+  for(NSInteger i = 0;i < configuration.filterDescription.parametersDescription.count;i++) {
+    IRFilterParameterDescription *parameterDescription = configuration.filterDescription.parametersDescription[i];
 
     UILabel *label = [UILabel new];
     label.text = parameterDescription.name;
@@ -48,15 +37,13 @@
     UISlider *slider = [UISlider new];
     slider.minimumValue = [parameterDescription.minValue floatValue];
     slider.maximumValue = [parameterDescription.maxValue floatValue];
-    slider.value = cellData.values[i].floatValue;
+    slider.value = configuration.filterParameters[parameterDescription].floatValue;
     slider.tag = i;
     [slider addTarget:self
                action:@selector(sliderValueChanged:)
      forControlEvents:UIControlEventValueChanged];
     [self.parametersStackView addArrangedSubview:slider];
   }
-
-  self.selected = cellData.enabled;
 }
 
 - (void)sliderValueChanged:(UISlider*)slider {

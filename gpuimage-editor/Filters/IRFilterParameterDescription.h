@@ -8,7 +8,7 @@
 
 #import <Foundation/Foundation.h>
 
-@interface IRFilterParameterDescription : NSObject
+@interface IRFilterParameterDescription : NSObject<NSCopying>
 
 @property(readonly) NSString *name;
 @property(readonly) NSString *setterName;

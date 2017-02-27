@@ -9,14 +9,14 @@
 #import "IRFiltersConfiguratorViewController.h"
 #import "IRFiltersRepository.h"
 #import "IRFiltersConfiguratorTableViewCell.h"
-#import "IRFiltersConfiguratorCellData.h"
 #import "IRFilterDescription.h"
 #import "IRPreviewViewController.h"
 #import "IRFilterParameterDescription.h"
+#import "IRFilterConfiguration.h"
+#import "IRLayerConfiguration.h"
+#import "IRPreviewViewController.h"
 
 @interface IRFiltersConfiguratorViewController () <IRFiltersConfiguratorTableViewCellDelegate>
-
-@property(nonatomic) NSMutableArray<IRFiltersConfiguratorCellData *> *tableData;
 
 @end
 
@@ -25,19 +25,22 @@
 - (void)viewDidLoad {
   [super viewDidLoad];
 
-  IRFiltersRepository *filtersRepository = [IRFiltersRepository new];
-  self.tableData = [NSMutableArray arrayWithCapacity:filtersRepository.filtersDescription.count];
-
-  for (NSUInteger i = 0; i < filtersRepository.filtersDescription.count; i++) {
-    IRFilterDescription *filterDescription = filtersRepository.filtersDescription[i];
-    self.tableData[i] = [[IRFiltersConfiguratorCellData alloc] initWithFilterDescription:filterDescription];
-  }
-
   self.tableView.estimatedRowHeight = 44.0;
   self.tableView.rowHeight = UITableViewAutomaticDimension;
-  self.tableView.allowsMultipleSelectionDuringEditing = true;
 
   [self.tableView setEditing:true];
+}
+
+- (void)viewWillAppear:(BOOL)animated {
+  [super viewWillAppear:animated];
+  
+  [[self previewViewController] setPreviewLayer:self.layerConfiguration];
+}
+
+- (void)viewDidDisappear:(BOOL)animated {
+  [super viewDidDisappear:animated];
+  
+  [[self previewViewController] setPreviewLayer:nil];
 }
 
 #pragma mark - Table View
@@ -47,31 +50,33 @@
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-  return self.tableData.count;
+  return self.layerConfiguration.filters.count;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
   IRFiltersConfiguratorTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"FilterDescriptionCell"
                                                                              forIndexPath:indexPath];
 
-  IRFiltersConfiguratorCellData *data = self.tableData[indexPath.row];
+  IRFilterConfiguration *configuration = self.layerConfiguration.filters[indexPath.row];
 
-  [cell fill:data];
+  [cell fill:configuration];
   [cell setDelegate:self];
-
+  
+  if(configuration.enabled) {
+    [tableView selectRowAtIndexPath:indexPath animated:NO scrollPosition:UITableViewScrollPositionNone];
+  } else {
+    [tableView deselectRowAtIndexPath:indexPath animated:NO];
+  }
+  
   return cell;
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-  self.tableData[indexPath.row].enabled = true;
-
-  [self updateConfiguration];
+  self.layerConfiguration.filters[indexPath.row].enabled = true;
 }
 
 - (void)tableView:(UITableView *)tableView didDeselectRowAtIndexPath:(NSIndexPath *)indexPath {
-  self.tableData[indexPath.row].enabled = false;
-
-  [self updateConfiguration];
+  self.layerConfiguration.filters[indexPath.row].enabled = false;
 }
 
 - (BOOL)tableView:(UITableView *)tableView canMoveRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -79,11 +84,8 @@
 }
 
 - (void)tableView:(UITableView *)tableView moveRowAtIndexPath:(NSIndexPath *)sourceIndexPath toIndexPath:(NSIndexPath *)destinationIndexPath {
-  IRFiltersConfiguratorCellData *data = self.tableData[sourceIndexPath.row];
-  [self.tableData removeObjectAtIndex:sourceIndexPath.row];
-  [self.tableData insertObject:data atIndex:destinationIndexPath.row];
-
-  [self updateConfiguration];
+  [self.layerConfiguration moveFilterFromIndex:sourceIndexPath.row
+                                       toIndex:destinationIndexPath.row];
 }
 
 #pragma mark - IRFiltersConfiguratorTableViewCellDelegate
@@ -96,55 +98,16 @@
   if (indexPath == nil) {
     return;
   }
-
-  self.tableData[indexPath.row].values[index] = @(value);
-
-  [self updateConfiguration];
+  
+  IRFilterConfiguration* filter = self.layerConfiguration.filters[indexPath.row];
+  IRFilterParameterDescription* parameterDescription = filter.filterDescription.parametersDescription[index];
+  [filter setFilterValue:@(value) forParameter:parameterDescription];
 }
 
 #pragma mark - Private
 
-- (void)updateConfiguration {
-  NSMutableArray<GPUImageFilter *> *filters = [NSMutableArray new];
-  NSMutableString* filtersCode = [NSMutableString stringWithString:@"NSMutableArray<GPUImageFilter*>* filters = [NSMutableArray array];\n"];
-  NSUInteger enabledFilterIdx = 0;
-
-  for (NSUInteger i = 0; i < self.tableData.count; i++) {
-    if (!self.tableData[i].enabled) {
-      continue;
-    }
-
-    NSString* className = self.tableData[i].filterDescription.className;
-    id filter = [NSClassFromString(className) new];
-    [filtersCode appendString:[NSString stringWithFormat:@"filters[%lu] = [%@ new];\n", (unsigned long)enabledFilterIdx, className]];
-
-    for (NSUInteger j = 0; j < self.tableData[i].filterDescription.parametersDescription.count; j++) {
-      IRFilterParameterDescription *parameterDescription = self.tableData[i].filterDescription.parametersDescription[j];
-
-      NSString* setterName = parameterDescription.setterName;
-      CGFloat value = self.tableData[i].values[j].floatValue;
-
-      SEL setterSelector = NSSelectorFromString(setterName);
-      NSMethodSignature *setterSignature = [[filter class] instanceMethodSignatureForSelector:setterSelector];
-      NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:setterSignature];
-      [invocation setTarget:filter];
-      [invocation setSelector:setterSelector];
-      [invocation setArgument:&value atIndex:2];
-      [invocation invoke];
-
-      [filtersCode appendString:[NSString stringWithFormat:@"[((%@*)filters[%lu]) %@%f];\n", className, (unsigned long)enabledFilterIdx, setterName, value]];
-    }
-
-    [filters addObject:filter];
-
-    enabledFilterIdx++;
-  }
-
-  UIViewController *viewController = [(UINavigationController *) [self.splitViewController.viewControllers lastObject] topViewController];
-  if ([viewController isKindOfClass:[IRPreviewViewController class]]) {
-    IRPreviewViewController *previewViewController = (IRPreviewViewController *) viewController;
-    [previewViewController setFilters:filters withCode:filtersCode];
-  }
+- (IRPreviewViewController*)previewViewController {
+  return (IRPreviewViewController*)[[self.splitViewController.viewControllers lastObject] topViewController];
 }
 
 @end

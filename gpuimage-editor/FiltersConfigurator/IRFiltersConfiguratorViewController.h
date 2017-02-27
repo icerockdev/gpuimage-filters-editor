@@ -8,10 +8,12 @@
 
 #import <UIKit/UIKit.h>
 
+@class IRLayerConfiguration;
 @class IRPreviewViewController;
 
 @interface IRFiltersConfiguratorViewController : UITableViewController
 
 @property(strong, nonatomic) IRPreviewViewController *previewViewController;
+@property IRLayerConfiguration* layerConfiguration;
 
 @end

@@ -8,41 +8,56 @@
 
 #import "IRLayersTableViewController.h"
 #import "IRLayerTableViewCell.h"
-#import "IRLayer.h"
+#import "IRLayerConfiguration.h"
+#import "IRFiltersConfiguratorViewController.h"
+#import "IRPreviewViewController.h"
+#import "IREditorConfiguration.h"
 
-@interface IRLayersTableViewController ()<IRLayerTableViewCellDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate>
+@interface IRLayersTableViewController ()<IRLayerTableViewCellDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate, IREditorConfigurationDelegate>
 
-@property NSMutableArray<IRLayer*>* items;
 @property NSIndexPath* imageDestinationIndexPath;
+@property IREditorConfiguration* editorConfiguration;
 
 @end
 
 @implementation IRLayersTableViewController
 
+static NSString* kShowFilters = @"filters";
 static NSString* kLayerCellReuseIdentifier = @"LayerCell";
 
 - (void)viewDidLoad {
   [super viewDidLoad];
   
-  self.items = [NSMutableArray array];
-  
   self.navigationItem.rightBarButtonItem = self.editButtonItem;
   
   self.tableView.estimatedRowHeight = 300;
   self.tableView.rowHeight = UITableViewAutomaticDimension;
+  
+  self.editorConfiguration = [IREditorConfiguration new];
+  self.editorConfiguration.delegate = self;
 }
 
 - (IBAction) addLayerButtonPressed:(UIBarButtonItem*)sender {
+  [self.editorConfiguration createLayer];
+}
+
+- (void)editorConfiguration:(IREditorConfiguration *)editorConfiguration
+                      layer:(IRLayerConfiguration *)layerConfiguration
+           didAppendToIndex:(NSUInteger)index {
   [self.tableView beginUpdates];
   
-  NSIndexPath* indexPath = [NSIndexPath indexPathForRow:self.items.count
-                                              inSection:0];
-  
-  [self.items addObject:[IRLayer new]];
+  NSIndexPath* indexPath = [NSIndexPath indexPathForRow:index inSection:0];
   [self.tableView insertRowsAtIndexPaths:@[indexPath]
-                        withRowAnimation:UITableViewRowAnimationMiddle];
+                        withRowAnimation:UITableViewRowAnimationAutomatic];
   
   [self.tableView endUpdates];
+}
+
+- (void)editorConfiguration:(IREditorConfiguration *)editorConfiguration
+                      layer:(IRLayerConfiguration *)layerConfiguration
+           didMoveFromIndex:(NSUInteger)fromIndex
+                    toIndex:(NSUInteger)toIndex {
+  
 }
 
 #pragma mark - Table view data source
@@ -53,7 +68,7 @@ static NSString* kLayerCellReuseIdentifier = @"LayerCell";
 
 - (NSInteger)tableView:(UITableView *)tableView
  numberOfRowsInSection:(NSInteger)section {
-  return self.items.count;
+  return self.editorConfiguration.layers.count;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView
@@ -65,7 +80,7 @@ static NSString* kLayerCellReuseIdentifier = @"LayerCell";
   
   cell.delegate = self;
   
-  IRLayer* layer = self.items[indexPath.row];
+  IRLayerConfiguration* layer = self.editorConfiguration.layers[indexPath.row];
   
   UIImage* image = layer.image;
   if(image == nil) {
@@ -104,10 +119,8 @@ canMoveRowAtIndexPath:(NSIndexPath *)indexPath {
 - (void)tableView:(UITableView *)tableView
 moveRowAtIndexPath:(NSIndexPath *)sourceIndexPath
       toIndexPath:(NSIndexPath *)destinationIndexPath {
-  IRLayer *data = self.items[sourceIndexPath.row];
-  
-  [self.items removeObjectAtIndex:sourceIndexPath.row];
-  [self.items insertObject:data atIndex:destinationIndexPath.row];
+  [self.editorConfiguration moveLayerFromIndex:sourceIndexPath.row
+                                       toIndex:destinationIndexPath.row];
 }
 
 #pragma mark - Layer cell delegate
@@ -137,11 +150,29 @@ moveRowAtIndexPath:(NSIndexPath *)sourceIndexPath
 }
 
 - (void)layerTableViewCell:(IRLayerTableViewCell *)cell filtersConfigurationButtonPressed:(UIButton *)button {
+  NSIndexPath* indexPath = [self.tableView indexPathForCell:cell];
   
+  if(indexPath == nil) {
+    return;
+  }
+  
+  [self performSegueWithIdentifier:kShowFilters
+                            sender:indexPath];
 }
 
 - (void)layerTableViewCell:(IRLayerTableViewCell *)cell blendConfigurationButtonPressed:(UIButton *)button {
   
+}
+
+#pragma mark - seque
+
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
+  if([segue.destinationViewController isKindOfClass:[IRFiltersConfiguratorViewController class]]) {
+    IRFiltersConfiguratorViewController* viewController = segue.destinationViewController;
+    NSIndexPath* indexPath = sender;
+    
+    viewController.layerConfiguration = self.editorConfiguration.layers[indexPath.row];
+  }
 }
 
 #pragma mark - Image picker delegate
@@ -158,15 +189,20 @@ moveRowAtIndexPath:(NSIndexPath *)sourceIndexPath
   [picker dismissViewControllerAnimated:true
                              completion:
    ^{
+     NSUInteger index = self.imageDestinationIndexPath.row;
+     self.editorConfiguration.layers[index].image = image;
      
      [self.tableView beginUpdates];
      
-     self.items[self.imageDestinationIndexPath.row].image = image;
      [self.tableView reloadRowsAtIndexPaths:@[self.imageDestinationIndexPath]
                            withRowAnimation:UITableViewRowAnimationFade];
      
      [self.tableView endUpdates];
    }];
+}
+
+- (IRPreviewViewController*)previewViewController {
+  return (IRPreviewViewController*)[[self.splitViewController.viewControllers lastObject] topViewController];
 }
 
 @end

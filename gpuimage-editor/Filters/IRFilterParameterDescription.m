@@ -34,4 +34,24 @@
   return self;
 }
 
+- (id)copyWithZone:(NSZone *)zone {
+  IRFilterParameterDescription* description = [[[self class] allocWithZone:zone] init];
+  
+  description->_name = self.name;
+  description->_setterName = self.setterName;
+  description->_minValue = self.minValue;
+  description->_maxValue = self.maxValue;
+  
+  return description;
+}
+
+-(BOOL)isEqual:(id)object {
+  if([object isKindOfClass:[IRFilterParameterDescription class]]) {
+    IRFilterParameterDescription* other = object;
+    
+    return [other.setterName isEqual:self.setterName];
+  }
+  return false;
+}
+
 @end
